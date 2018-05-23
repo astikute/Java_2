@@ -18,5 +18,6 @@ public class Syntax {
 		}
 
 		System.out.println("Beigu vçrtîba: " + someNumber);
+		sc.close();
 	}
 }
