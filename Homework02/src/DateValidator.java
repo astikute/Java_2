@@ -6,12 +6,24 @@ public class DateValidator {
 
 		Scanner sc = new Scanner(System.in);
 		
-		System.out.print("Ievadiet datumu: ");
-		int datums = sc.nextInt();
-		System.out.print("Ievadiet mçnesi: ");
-		int menesis = sc.nextInt();
-		System.out.print("Ievadiet gadu: ");
-		int gads = sc.nextInt();
+		int datums = -1;
+		while (datums < 0 || datums > 31) {
+			System.out.print("Ievadiet datumu: ");
+			datums = sc.nextInt();
+		}
+		
+		int menesis = -1;
+		while (menesis < 1 || menesis > 12) {
+			System.out.print("Ievadiet mçnesi: ");
+			menesis = sc.nextInt();
+		}
+		
+		int gads = -1;
+		while (gads < 1) {
+			System.out.print("Ievadiet gadu: ");
+			gads = sc.nextInt();
+		}
+		sc.close();
 		
 		String [] menesuNosaukumi = {"janvâris", "februâris", "marts", "aprîlis", "maijs", "jûnijs", "jûlijs", "augusts", "septembris",
 				"oktobris", "novembris", "decembris"};
@@ -23,9 +35,5 @@ public class DateValidator {
 		} else {
 			System.out.println("Ievadîtie dati: " + datums + "." + menesuNosaukumi [menesis-1] + " " + gads + ".gads");
 		}
-		
-		sc.close();
 	}
-	
-
 }

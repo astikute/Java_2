@@ -24,9 +24,15 @@ public class HelloUser {
 			String uzvards = vardsUzvards.substring(vardsUzvards.indexOf(' ')).trim().toUpperCase(); // atdala uzvârda(-u) daïu
 
 			if (uzvards.contains(" ")) { // Ja ir vairâki uzvârdi, atdala katru atseviðíi
-				String uzvards1 = uzvards.substring(0, uzvards.indexOf(' '));
+				String [] arr = uzvards.split(" ");
+				for (int i = 0; i < arr.length; i++) {
+					if (!arr[i].equals("")) {
+						System.out.print("'" + arr[i] + "'");
+					}
+				/*String uzvards1 = uzvards.substring(0, uzvards.indexOf(' '));
 				String uzvards2 = uzvards.substring(uzvards.indexOf(' ')).trim();
-				System.out.println("'" + uzvards1 + "-" + uzvards2 + "'");
+				System.out.println("'" + uzvards1 + "-" + uzvards2 + "'");*/
+				}
 			} else { // Ja ir tikai viens uzvârds
 				System.out.print("'" + uzvards + "'");
 			}
