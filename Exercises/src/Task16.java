@@ -4,7 +4,7 @@ class Task16 {
 
 	public static void main(String[] args) {
 
-		//16.uzdevums: apprçíina studenta vidçjo atzîmi un saglabâ tâs vienâ masîvâ
+		//16.uzdevums: apprekina studenta videjo atzimi un saglaba tas viena masiva
 		
 		int [][] arrStudent = {	{68, 58, 79},
 								{79, 76, 81} };

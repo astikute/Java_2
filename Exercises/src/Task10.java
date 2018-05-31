@@ -5,7 +5,7 @@ public class Task10 {
 
 	public static void main(String[] args) {
 
-		//10.uzdevums: jâuzmin uzìenerçtais skaitlis
+		//10.uzdevums: jauzmin uzgeneretais skaitlis
 		Scanner sc = new Scanner (System.in);
 		Random rnd = new Random();
 		int randomNumb = rnd.nextInt(10) + 1;

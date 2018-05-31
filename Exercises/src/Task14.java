@@ -3,11 +3,11 @@ public class Task14 {
 
 	public static void main(String[] args) {
 
-		//14.uzdevums: visus masîva elementus, kas ir 0, pârvietot uz masîva beigâm
+		//14.uzdevums: visus masiva elementus, kas ir 0, parvietot uz masiva beigam
 		
 		int [] ints = {0, 4, 0, 7, 8, 9, 0, 1};
 		
-		int [] changedInts = new int [ints.length]; // sâkumâ visi elementi masîvâ ir 0
+		int [] changedInts = new int [ints.length]; // sakuma visi elementi masiva ir 0
 		int j = 0;
 		
 		for (int i = 0; i < ints.length; i++) {

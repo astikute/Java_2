@@ -3,7 +3,7 @@ public class Task11 {
 
 	public static void main(String[] args) {
 
-		//11.uzdevums: jâizvada visus pozitîvo divu ciparu skaitïus un to ciparu summu
+		//11.uzdevums: jaizvada visus pozitivo divu ciparu skaitlus un to ciparu summu
 		
 		int theNumb = 10;
 		

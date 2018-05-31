@@ -3,7 +3,7 @@ public class Task13 {
 
 	public static void main(String[] args) {
 
-		//13.uzdevums: kâpinât visus masîva elementus treðajâ pakâpç
+		//13.uzdevums: kapinat visus masiva elementus tresaja pakape
 		
 		int [] ints = {1, 3, 5, 6, 7};
 		

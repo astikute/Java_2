@@ -4,7 +4,7 @@ public class Task9 {
 
 	public static void main(String[] args) {
 
-		//9.uzdevums: jâizvada ievadîtâ skaitïa reizrçíina tabula
+		//9.uzdevums: jaizvada ievadita skaitla reizrekina tabula
 		Scanner sc = new Scanner(System.in);
 		
 		System.out.print("Ievadiet veselu skaitli: ");
