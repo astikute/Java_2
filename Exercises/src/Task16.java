@@ -6,8 +6,7 @@ class Task16 {
 
 		//16.uzdevums: apprekina studenta videjo atzimi un saglaba tas viena masiva
 		
-		int [][] arrStudent = {	{68, 58, 79},
-								{79, 76, 81} };
+		int [][] arrStudent = {	{68, 58, 79}, {79, 76, 81} };
 		
 		String [] averageScore = new String [arrStudent.length];
 		double sumScore;
