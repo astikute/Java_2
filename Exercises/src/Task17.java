@@ -7,8 +7,8 @@ public class Task17 {
 		
 		int [][] ints = //{{17, 10, 15}, {12, 14, 16}, {13, 18, 11}}; //ir
 						//{{5, 4, 1}, {1, 9, 7}, {5, 2, 8}}; // nav
-						//{{1, 15, 14, 4}, {10, 11, 8, 5}, {7, 6, 9, 12}, {16, 2, 3, 13}}; // ir!
-						{{1, 15, 14, 4}, {11, 10, 8, 5}, {6, 7, 9, 12}, {16, 2, 3, 13}}; // diagonalu summa !=
+						{{1, 15, 14, 4}, {10, 11, 8, 5}, {7, 6, 9, 12}, {16, 2, 3, 13}}; // ir!
+						//{{1, 15, 14, 4}, {11, 10, 8, 5}, {6, 7, 9, 12}, {16, 2, 3, 13}}; // diagonalu summa !=
 		
 		boolean Check = true; //Lai sekotu lidzi, vai visi nosacijumi izpildas
 		
@@ -34,7 +34,7 @@ public class Task17 {
 			}
 			// Salidzina, vai rindu un kolonnu summas ir vienadas
 			for (int i = 1; i < ints.length; i++) {
-				if ((sumResultsRow [i-1] != sumResultsRow [i]) || (sumResultsCol [i-1] != sumResultsCol [i])) {
+				if ((sumResultsRow [i-1] != sumResultsRow [i]) || (sumResultsCol [i-1] != sumResultsCol [i]) || sumResultsRow [i] != sumResultsCol [i]) {
 					Check = false;
 					break;
 				}
