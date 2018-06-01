@@ -35,13 +35,13 @@ public class SortArray_v2 {
 			setMin = 100;
 			for (int i = counter; i < arrSize; i++) {
 				if (setMin > arr[i]) {
-					setMin = arr[i];
-					id = i;
+					setMin = arr[i]; //Saglaba min vertibu
+					id = i; //Saglaba min vertibai atbilstoso sunas adresi
 				}
 			}
 			// Samaina masiva elementu vertibas
 			value = arr[counter];
-			arr[counter] = setMin;
+			arr[counter] = setMin; 
 			arr[id] = value;
 			counter++;
 		}
