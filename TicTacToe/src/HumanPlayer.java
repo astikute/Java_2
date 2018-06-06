@@ -24,6 +24,7 @@ public class HumanPlayer implements Player {
 	private int askPlayerMove(Scanner sc, String str) {
 		int a; boolean isInt;
 		do {
+			
 			do {
 				System.out.print(str);
 				isInt = sc.hasNextInt(); //Parbauda, vai ir ievadits skaitlis
@@ -31,6 +32,7 @@ public class HumanPlayer implements Player {
 					sc.next();
 				}
 			} while (!isInt);
+			
 			a = sc.nextInt();
 		} while (!checkPosition(a)); //Parbauda, vai var novietot taja pozicija
 		return a;

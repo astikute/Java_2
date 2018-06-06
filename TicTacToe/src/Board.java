@@ -1,6 +1,6 @@
 
 public class Board {
-	
+
 	private static String[][] arr = { { " ", " ", " " }, { " ", " ", " " }, { " ", " ", " " } };
 
 	public static void printBoard() {
@@ -24,18 +24,21 @@ public class Board {
 	public static boolean checkWinner() {
 		for (int i = 0; i < arr.length; i++) {
 			if (!arr[i][0].equals(" ")) { // Parbauda, vai rinda sakas ar "X" vai "O"
-				if (arr[i][0].equals(arr[i][1]) && arr[i][1].equals(arr[i][2])) { // parbauda, vai rindas elementi ir vienadi
+				if (arr[i][0].equals(arr[i][1]) && arr[i][1].equals(arr[i][2])) { // parbauda, vai rindas elementi ir
+																					// vienadi
 					return true;
 				}
-				if (!arr[0][i].equals(" ")) { // Parbauda, vai kolonna sakas ar "X" vai "O"
-					if (arr[0][i].equals(arr[1][i]) && arr[1][i].equals(arr[2][i])) { // parbauda, vai kolonnas elementi ir vienadi
-						return true;
-					}
+			}
+			if (!arr[0][i].equals(" ")) { // Parbauda, vai kolonna sakas ar "X" vai "O"
+				if (arr[0][i].equals(arr[1][i]) && arr[1][i].equals(arr[2][i])) { // parbauda, vai kolonnas elementi ir
+																					// vienadi
+					return true;
 				}
 			}
 		}
 		if (!arr[1][1].equals(" ")) { // Parbauda, vai masiva centrs satur "X" vai "O"
-			if (arr[0][0].equals(arr[1][1]) && arr[1][1].equals(arr[2][2])) { // parbauda, vai diagonales visi elementi ir vienadi
+			if (arr[0][0].equals(arr[1][1]) && arr[1][1].equals(arr[2][2])) { // parbauda, vai diagonales visi elementi
+																				// ir vienadi
 				return true;
 			} else if (arr[2][0].equals(arr[1][1]) && arr[1][1].equals(arr[0][2])) {
 				return true;
