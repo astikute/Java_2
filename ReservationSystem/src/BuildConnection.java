@@ -12,7 +12,6 @@ public class BuildConnection {
 		try {
 			Class.forName(driver);
 			Connection conn = DriverManager.getConnection(url, username, password);
-			System.out.println("It's ok!");
 			return conn;
 		} catch (Exception e) {
 			System.out.println(e);

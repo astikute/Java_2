@@ -3,7 +3,10 @@ public class test {
 
 	public static void main(String[] args) {
 		
-		new MainDisplay (BuildConnection.getConnection());
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+            	new MainDisplay (BuildConnection.getConnection()); 
+            }
+        });
 	}
-
 }

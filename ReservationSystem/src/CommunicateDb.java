@@ -2,18 +2,21 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Time;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
 import javax.swing.table.DefaultTableModel;
 
 public class CommunicateDb {
 	
 	public static Time convertIntoTime (String str) {
-	    DateFormat dateFormat = new SimpleDateFormat("hh:mm");
+	    DateFormat dateFormat = new SimpleDateFormat("HH:mm");
 	    Date date = null;
 		try {
 			date = dateFormat.parse(str);
@@ -27,8 +30,8 @@ public class CommunicateDb {
 	public static void displayReservations (Connection conn, DefaultTableModel model) {
 		try {
 			String queryString = "SELECT employees.id, name, last_name, rent_from, rent_till "
-					+ "FROM employees, rent_bike "
-					+ "WHERE employees.id=rent_bike.id "
+					+ "FROM employees "
+					+ "LEFT JOIN rent_bike ON employees.id=rent_bike.id "
 					+ "ORDER BY employees.id";
 			PreparedStatement ps = conn.prepareStatement(queryString);
 			ResultSet results = ps.executeQuery(queryString);
@@ -36,12 +39,16 @@ public class CommunicateDb {
 				String dbId = results.getString("id");
 	    		String dbName = results.getString("name");
 	    		String dbLast = results.getString("last_name");
-	    		String dbFrom = results.getString("rent_from").substring(0,5);
-	    		String dbTill = results.getString("rent_till").substring(0,5);
+	    		String dbFrom = results.getString("rent_from");
+	    		String dbTill = results.getString("rent_till");
+	    		if (dbFrom != null && dbTill != null) {
+	    			dbFrom = dbFrom.substring(0, 5);
+	    			dbTill = dbTill.substring(0, 5);
+	    		}
 	    		model.addRow(new Object[] {dbId, dbName, dbLast, dbFrom, dbTill});
 			}
-			} catch (SQLException ex) {
-				System.out.println(ex);
+			} catch (SQLException sql) {
+				System.out.println(sql);
 			}
 	}
 	
@@ -56,8 +63,8 @@ public class CommunicateDb {
 					return true;
 				}
 			} 
-			} catch (SQLException ex) {
-				System.out.println(ex);
+			} catch (SQLException sql) {
+				System.out.println(sql);
 			}
 		return false;	
 	}
@@ -71,7 +78,7 @@ public class CommunicateDb {
 			Date time2 = convertIntoTime(inputTime2);
 
         	while (results.next()) {
-        		
+        			
         		String dbFrom = results.getString("rent_from");
         		Date db1 = convertIntoTime(dbFrom);
         		String dbTill = results.getString("rent_till");
@@ -84,8 +91,8 @@ public class CommunicateDb {
         			return false;
         		}
         	}
-		} catch (SQLException ex) {
-			System.out.println(ex);
+		} catch (SQLException sql) {
+			System.out.println(sql);
 		}
 		return true;
 	}
@@ -99,8 +106,20 @@ public class CommunicateDb {
 			int parseInput = Integer.parseInt(input);
 			ps.setInt(3, parseInput);
 			ps.execute();
-		} catch (SQLException ex) {
-			System.out.println(ex);
+		} catch (SQLIntegrityConstraintViolationException e) {
+			MainDisplay.showMsg("Employee has already a reservation!");
+		} catch (SQLException sql) {
+		}
+	}
+	
+	public static void deleteReservations (Connection conn, int id) {
+		try {
+			String queryString = "DELETE FROM rent_bike WHERE id = ?";
+			PreparedStatement ps = conn.prepareStatement(queryString);
+			ps.setInt(1, id);
+			ps.execute();
+		} catch (SQLException sql) {
+			System.out.println(sql);
 		}
 	}
 }
