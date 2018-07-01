@@ -2,11 +2,26 @@ import java.util.Scanner;
 
 public class Game {
 
+	private static Scanner sc = new Scanner(System.in);
+
+	private static Game newGame;
+	private static boolean continueGame;
+
+	private static int[] arrPosition; // Masivs, lai saglabatu gajiena koordinatas
+
+	private static String scan; // Nolasa ievadito virkni
+
+	private static int playerOneWins = 0; // Skaita uzvaras un neizskirtus
+	private static int playerTwoWins = 0;
+	private static int tiesCount = 0;
+
 	private static int moveCount; // Lai mainitu speletajus (nepara skaitlis - Player1; para skaitlis - Player2)
+	private static String playersVariation; // Saglaba izveli, kadi bus speletaji
+	private static String playerSymbol; // Saglaba vertibu "X" vai "O"
 
 	Player player1, player2;
 
-	//Konstruktors
+	// Konstruktors
 	private Game(Player p1, Player p2) {
 		player1 = p1;
 		player2 = p2;
@@ -26,30 +41,10 @@ public class Game {
 
 	public static void playGame() {
 
-		Scanner sc = new Scanner(System.in);
-		boolean continueGame;
-		int[] arrPosition; //Masivs, lai saglabatu gajiena koordinatas
-		String scan; //Nolasa ievadito virkni
-		String playerSymbol; //Saglaba vertibu "X" vai "O"
-		int playerOneWins = 0, playerTwoWins = 0, tiesCount = 0; //Skaita uzvaras un neizskirtus
-		String playersVariation; //Saglaba izveli, kadi bus speletaji
-		Game newGame;
-		
-		//Noskaidrojam speletajus
-		System.out.print("Izvçlieties spçlçtâjus (varianti: [1] cilvçks-cilvçks, [2] cilvçks-dators): ");
-		playersVariation = sc.next();
+		// Noskaidrojam speletajus
+		enterPlayers();
 
-		switch (playersVariation) {
-			default: 
-				System.out.println("Tâdu izvçli nedevâm! Spçlçsi cilvçks pret cilvçku!");
-			case "1":
-				newGame = new Game(new HumanPlayer(), new HumanPlayer());
-				break;
-			case "2":
-				newGame = new Game(new HumanPlayer(), new ComputerPlayer());
-				break;
-		}
-		//Speles sakums
+		// Speles sakums
 		do {
 			System.out.println("---TicTacToe----");
 			Board.clearBoard();
@@ -78,22 +73,43 @@ public class Game {
 			System.out.println(gameStatus());
 
 			// Noskaidro statusu, lai sekotu lidzi kopejam rezultatam
-			if (gameStatus() == GameStatus.Uzvarçjis_spçlçtâjs_1) {
-				playerOneWins++;
-			} else if (gameStatus() == GameStatus.Uzvarçjis_spçlçtâjs_2) {
-				playerTwoWins++;
-			} else
-				tiesCount++;
-
-			System.out.println("Uzvaras: 1.spçlçtâjs - " + playerOneWins + "; 2.spçlçtâjs - " + playerTwoWins
-					+ "; neizðíirti - " + tiesCount);
+			overallStatus();
 
 			// Noskaidrojam, vai velas turpinat
 			System.out.println("Ja velies turpinat, saki 'Ja'!");
-			sc.nextLine(); //Drosibai, ja sc paliek kaut kas no ieprieksejas ievades
+			sc.nextLine(); // Drosibai, ja sc paliek kaut kas no ieprieksejas ievades
 			scan = sc.next();
 			continueGame = (scan.equals("Ja")) ? true : false;
 
 		} while (continueGame);
-	}	
+	}
+
+	private static void enterPlayers() {
+
+		System.out.print("Izvçlieties spçlçtâjus (varianti: [1] cilvçks-cilvçks, [2] cilvçks-dators): ");
+		playersVariation = sc.next();
+
+		switch (playersVariation) {
+		default:
+			System.out.println("Tâdu izvçli nedevâm! Spçlçsi cilvçks pret cilvçku!");
+		case "1":
+			newGame = new Game(new HumanPlayer(), new HumanPlayer());
+			break;
+		case "2":
+			newGame = new Game(new HumanPlayer(), new ComputerPlayer());
+			break;
+		}
+	}
+
+	private static void overallStatus() {
+		if (gameStatus() == GameStatus.Uzvarçjis_spçlçtâjs_1) {
+			playerOneWins++;
+		} else if (gameStatus() == GameStatus.Uzvarçjis_spçlçtâjs_2) {
+			playerTwoWins++;
+		} else
+			tiesCount++;
+
+		System.out.println("Uzvaras: 1.spçlçtâjs - " + playerOneWins + "; 2.spçlçtâjs - " + playerTwoWins
+				+ "; neizðíirti - " + tiesCount);
+	}
 }
