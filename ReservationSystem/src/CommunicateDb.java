@@ -4,36 +4,35 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Time;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
 import javax.swing.table.DefaultTableModel;
 
 public class CommunicateDb {
-		
-	public static void displayReservations (Connection conn, String date, DefaultTableModel model) {
+	
+	private static Connection conn = BuildConnection.getConnection();
+	private static String queryString;
+	private static PreparedStatement ps;
+	private static ResultSet results;
+	private static String dbId, dbName, dbLast, dbFrom, dbTill, dbBike, tableName;
+	
+	//Displays all employees and added reservation if one exists
+	public static void displayReservations (String date, DefaultTableModel model) {
+		tableName = Operations.modifyString(tableName, date);
+		model.setRowCount(1);
 		try {
-			String queryString = "SELECT employees.id, name, last_name, rent_from, rent_till, rent_bike.bike_id "
+			queryString = "SELECT employees.id, name, last_name,"
+					+ " " + tableName + ".rent_from, " + tableName + ".rent_till, " + tableName + ".bike_id "
 					+ "FROM employees "
-					+ "LEFT JOIN rent_bike ON employees.id=rent_bike.id "
-					+ "AND date = ? "
+					+ "LEFT JOIN " + tableName + " ON employees.id=" + tableName +".id "
 					+ "ORDER BY employees.id";
-			PreparedStatement ps = conn.prepareStatement(queryString);
-			ps.setString(1, date);
-			ResultSet results = ps.executeQuery();
+			ps = conn.prepareStatement(queryString);
+			results = ps.executeQuery();
 			while (results.next()) {
-				String dbId = results.getString("id");
-	    		String dbName = results.getString("name");
-	    		String dbLast = results.getString("last_name");
-	    		String dbFrom = results.getString("rent_from");
-	    		String dbTill = results.getString("rent_till");
-	    		String dbBike = results.getString("bike_id");
+				dbId = results.getString("id");
+	    		dbName = results.getString("name");
+	    		dbLast = results.getString("last_name");
+	    		dbFrom = results.getString("rent_from");
+	    		dbTill = results.getString("rent_till");
+	    		dbBike = results.getString("bike_id");
 	    		if (dbFrom != null && dbTill != null) {
 	    			dbFrom = dbFrom.substring(0, 5);
 	    			dbTill = dbTill.substring(0, 5);
@@ -41,62 +40,65 @@ public class CommunicateDb {
 	    		model.addRow(new Object[] {dbId, dbName, dbLast, dbFrom, dbTill, dbBike});
 			}
 		} catch (SQLException sql) {
-			System.out.println(sql);
+			MainDisplay.showMsg("Can not load information from database!");
 		}
 	}
 	
-	public static boolean validateUser (Connection conn, String input) {
+	//Checks if employees id exists
+	public static boolean validateUser (String input) {
 		try {
-			String queryString = "SELECT id FROM employees";
-			PreparedStatement ps = conn.prepareStatement(queryString);
-			ResultSet results = ps.executeQuery(queryString);
+			queryString = "SELECT id FROM employees";
+			ps = conn.prepareStatement(queryString);
+			results = ps.executeQuery(queryString);
 			while (results.next()) {
 				String dbId = results.getString("id");
 				if (dbId.equals(input)) {
 					return true;
 				}
 			} 
-			} catch (SQLException sql) {
-				System.out.println(sql);
-			}
+		} catch (SQLException sql) {
+			MainDisplay.showMsg("Can not load information from database!");
+		}
 		return false;	
 	}
 	
-	public static String checkReservations (Connection conn, String inputTime1, String inputTime2, String date) {
+	//Gets list of electric bikes
+	//Checks if any of bikes are available at chosen time
+	//Assigns available bike automatically
+	public static String checkReservations (String inputTime1, String inputTime2, String date) {
 		String[] arr = new String[100];
 		int i = 0;
-		Time time1 = convertIntoTime(inputTime1);
-		Time time2 = convertIntoTime(inputTime2);
+		Time time1 = Operations.convertIntoTime(inputTime1);
+		Time time2 = Operations.convertIntoTime(inputTime2);
 		Boolean rentAvailable;
 		
 		try { 
-			String queryString = "SELECT bike_id FROM electric_bikes";
-			PreparedStatement ps = conn.prepareStatement(queryString);
-			ResultSet results = ps.executeQuery(queryString);
-			
+			queryString = "SELECT bike_id FROM electric_bikes";
+			ps = conn.prepareStatement(queryString);
+			results = ps.executeQuery(queryString);
 			while (results.next()) {
 				arr[i] = results.getString("bike_id");
 				i++;
 			}
 		} catch (SQLException sql) {
-			System.out.println(sql);
+			MainDisplay.showMsg("Can not load information from database!");
 		}
 		
 		for (int j = 0; j < arr.length; j++) {
 			rentAvailable = true;
+			tableName = Operations.modifyString(tableName, date);
 			try {
-				String queryString = "SELECT rent_from, rent_till "
-						+ "FROM rent_bike WHERE bike_id = ? and date = ?";
-				PreparedStatement ps = conn.prepareStatement(queryString);
+				queryString = "SELECT " + tableName + ".rent_from, " + tableName + ".rent_till "
+						+ "FROM " + tableName + " WHERE bike_id = ?";
+				ps = conn.prepareStatement(queryString);
 				ps.setString(1, arr[j]);
-				ps.setString(2, date);
-				ResultSet results = ps.executeQuery();
+				results = ps.executeQuery();
 			
 				while (results.next()) {
-					String dbFrom = results.getString("rent_from");
-					String dbTill = results.getString("rent_till");
-					Time db1 = convertIntoTime(dbFrom);
-					Time db2 = convertIntoTime(dbTill);
+					dbFrom = results.getString("rent_from");
+					dbTill = results.getString("rent_till");
+					Time db1 = Operations.convertIntoTime(dbFrom);
+					Time db2 = Operations.convertIntoTime(dbTill);
 					
 					if ((db1.before(time1) || db1.compareTo(time1) == 0) && db2.after(time1)) {
 						rentAvailable = false;
@@ -108,7 +110,7 @@ public class CommunicateDb {
 					}
 				}
 			} catch (SQLException sql) {
-				System.out.println(sql);
+				MainDisplay.showMsg("Can not load information from database!");
 			}
 			if (rentAvailable) {
 				return arr[j];
@@ -117,96 +119,65 @@ public class CommunicateDb {
 		return null;
 	}
 	
-	public static void setReservations (Connection conn, String inputTime1, String inputTime2, String input, String bikeId, String date) {
+	//Updates database with new reservation
+	public static void setReservations (String inputTime1, String inputTime2, String input, String bikeId, String date) {
+		tableName = Operations.modifyString(tableName, date);
 		try {
-			String queryString = "INSERT INTO rent_bike (rent_from, rent_till, id, bike_id, date) "
-					+ "VALUES (?, ?, ?, ?, ?)";
-			PreparedStatement ps = conn.prepareStatement(queryString);
-			ps.setTime(1, modifyTime(inputTime1));
-			ps.setTime(2, modifyTime(inputTime2));
+			queryString = "INSERT INTO " + tableName + " (rent_from, rent_till, id, bike_id) "
+					+ "VALUES (?, ?, ?, ?)";
+			ps = conn.prepareStatement(queryString);
+			ps.setTime(1, Operations.modifyTime(inputTime1));
+			ps.setTime(2, Operations.modifyTime(inputTime2));
 			int parseInput = Integer.parseInt(input);
 			ps.setInt(3, parseInput);
 			ps.setString(4, bikeId);
-			ps.setString(5, date);
 			ps.execute();
 		} catch (SQLIntegrityConstraintViolationException e) {
 			MainDisplay.showMsg("Employee has already a reservation!");
 		} catch (SQLException sql) {
+			MainDisplay.showMsg("Can not upload information to database!");
 		}
 	}
 	
-	public static void deleteReservations (Connection conn, int id, String date) {
+	//Deletes reservation from database
+	public static void deleteReservations (int id, String date) {
+		tableName = Operations.modifyString(tableName, date);
 		try {
-			String queryString = "DELETE FROM rent_bike WHERE id = ? and date = ?";
-			PreparedStatement ps = conn.prepareStatement(queryString);
+			queryString = "DELETE FROM " + tableName + " WHERE id = ?";
+			ps = conn.prepareStatement(queryString);
 			ps.setInt(1, id);
-			ps.setString(2, date);
 			ps.execute();
 		} catch (SQLException sql) {
-			System.out.println(sql);
+			MainDisplay.showMsg("Can not upload information to database!");
 		}
 	}
 	
-	public static String[] updateDate () {
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Calendar calendar = GregorianCalendar.getInstance();
-		String today = dateFormat.format(calendar.getTime());
-		calendar.add(GregorianCalendar.DAY_OF_MONTH, 1);
-		String tomorrow = dateFormat.format(calendar.getTime());
-		calendar = GregorianCalendar.getInstance();
-		calendar.add(GregorianCalendar.DAY_OF_MONTH, -1);
-		String yesterday = dateFormat.format(calendar.getTime());
-		String[] dates = {today, tomorrow, yesterday};
-		return dates;
-	}
-	
-	public static void deleteYesterdayReservations (Connection conn, String str) {
+	//Deletes table in database with date = yesterday
+	public static void deleteTable (String str) {
+		tableName = Operations.modifyString(tableName, str);
 		try {
-			String queryString = "DELETE FROM rent_bike WHERE date = ?";
-			PreparedStatement ps = conn.prepareStatement(queryString);
-			ps.setString(1, str);
+			queryString = "DROP TABLE IF EXISTS " + tableName;
+			ps = conn.prepareStatement(queryString);
 			ps.execute();
 		} catch (SQLException sql) {
-			System.out.println(sql);
+			MainDisplay.showMsg("Can not update database!");
 		}
 	}
 	
-	public static Time modifyTime (String str) {
-	    DateFormat dateFormat = new SimpleDateFormat("HH:mm");
+	//Creates table in database for date = tomorrow
+	public static void createTable (String str) {
+		tableName = Operations.modifyString(tableName, str);
 		try {
-			Date date = dateFormat.parse(str);
-		    Calendar calendar = GregorianCalendar.getInstance();
-		    calendar.setTime(date);
-		    calendar.add(GregorianCalendar.HOUR, -1);
-		    date = calendar.getTime();
-			Time time = new Time(date.getTime());
-			return time;
-		} catch (ParseException e) {
-			e.printStackTrace();
+			queryString = "CREATE TABLE IF NOT EXISTS " + tableName + " ("
+					+ "id INT NOT NULL, "
+					+ "rent_from TIME NOT NULL, "
+					+ "rent_till TIME NOT NULL, "
+					+ "bike_id VARCHAR(30) NOT NULL, "
+					+ "PRIMARY KEY (id))";
+			ps = conn.prepareStatement(queryString);
+			ps.execute();
+		} catch (SQLException sql) {
+			MainDisplay.showMsg("Can not update database!");
 		}
-		return null;
-	}
-	
-	public static Time convertIntoTime (String str) {
-	    DateFormat dateFormat = new SimpleDateFormat("HH:mm");
-	    Date date = null;
-		try {
-			date = dateFormat.parse(str);
-			Time time = new Time(date.getTime());
-			return time;
-		} catch (ParseException e) {
-		}
-		return null;
-	}
-	
-	public static boolean isValidInput (String str) {
-		try {
-			new SimpleDateFormat("HH:mm").parse(str);
-			return true;
-		} catch (ParseException e) {
-			MainDisplay.showMsg("Invalid time!");
-			return false;
-		}
-		
 	}
 }

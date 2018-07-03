@@ -7,14 +7,15 @@ public class BuildConnection {
 	private static String url = "jdbc:mysql://localhost:3306/task_290618";
 	private static String username = "root";
 	private static String password = "";
+	private static Connection conn;
 
 	public static Connection getConnection() {
 		try {
 			Class.forName(driver);
-			Connection conn = DriverManager.getConnection(url, username, password);
+			conn = DriverManager.getConnection(url, username, password);
 			return conn;
 		} catch (Exception e) {
-			System.out.println(e);
+			MainDisplay.showMsg("Can not connect to database!");
 			return null;
 		}
 	}
