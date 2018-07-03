@@ -6,13 +6,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import javax.swing.JOptionPane;
+
 public class Operations {
 	
 	private static DateFormat dateFormat = new SimpleDateFormat("HH:mm");
 	private static Date date;
 	private static Time time;
 
-	//Modify time value before adding a new reservation in database
+	//Modifies time value before adding a new reservation in database
 	public static Time modifyTime (String str) {
 		try {
 			date = dateFormat.parse(str);
@@ -48,7 +50,7 @@ public class Operations {
 		}
 	}
 	
-	//Modifies database table name
+	//Adds date to database table name
 	public static String modifyString (String name, String date) {
 		name = "rent_bike_";
 		return name + date.replace("-", "");
@@ -66,5 +68,10 @@ public class Operations {
 		String yesterday = df.format(calendar.getTime());
 		String[] dates = {today, tomorrow, yesterday};
 		return dates;
+	}
+	
+	//Creates a error message when data is missing/invalid 
+	public static void showMsg (String str) {
+		JOptionPane.showMessageDialog(null, str, "Message", JOptionPane.ERROR_MESSAGE);
 	}
 }

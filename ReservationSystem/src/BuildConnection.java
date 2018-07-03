@@ -15,7 +15,7 @@ public class BuildConnection {
 			conn = DriverManager.getConnection(url, username, password);
 			return conn;
 		} catch (Exception e) {
-			MainDisplay.showMsg("Can not connect to database!");
+			Operations.showMsg("Can not connect to database!");
 			return null;
 		}
 	}

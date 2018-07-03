@@ -40,7 +40,7 @@ public class CommunicateDb {
 	    		model.addRow(new Object[] {dbId, dbName, dbLast, dbFrom, dbTill, dbBike});
 			}
 		} catch (SQLException sql) {
-			MainDisplay.showMsg("Can not load information from database!");
+			Operations.showMsg("Can not load information from database!");
 		}
 	}
 	
@@ -57,7 +57,7 @@ public class CommunicateDb {
 				}
 			} 
 		} catch (SQLException sql) {
-			MainDisplay.showMsg("Can not load information from database!");
+			Operations.showMsg("Can not load information from database!");
 		}
 		return false;	
 	}
@@ -81,7 +81,7 @@ public class CommunicateDb {
 				i++;
 			}
 		} catch (SQLException sql) {
-			MainDisplay.showMsg("Can not load information from database!");
+			Operations.showMsg("Can not load information from database!");
 		}
 		
 		for (int j = 0; j < arr.length; j++) {
@@ -110,7 +110,7 @@ public class CommunicateDb {
 					}
 				}
 			} catch (SQLException sql) {
-				MainDisplay.showMsg("Can not load information from database!");
+				Operations.showMsg("Can not load information from database!");
 			}
 			if (rentAvailable) {
 				return arr[j];
@@ -133,9 +133,9 @@ public class CommunicateDb {
 			ps.setString(4, bikeId);
 			ps.execute();
 		} catch (SQLIntegrityConstraintViolationException e) {
-			MainDisplay.showMsg("Employee has already a reservation!");
+			Operations.showMsg("Employee has already a reservation!");
 		} catch (SQLException sql) {
-			MainDisplay.showMsg("Can not upload information to database!");
+			Operations.showMsg("Can not upload information to database!");
 		}
 	}
 	
@@ -148,7 +148,7 @@ public class CommunicateDb {
 			ps.setInt(1, id);
 			ps.execute();
 		} catch (SQLException sql) {
-			MainDisplay.showMsg("Can not upload information to database!");
+			Operations.showMsg("Can not upload information to database!");
 		}
 	}
 	
@@ -160,11 +160,11 @@ public class CommunicateDb {
 			ps = conn.prepareStatement(queryString);
 			ps.execute();
 		} catch (SQLException sql) {
-			MainDisplay.showMsg("Can not update database!");
+			Operations.showMsg("Can not update database!");
 		}
 	}
 	
-	//Creates table in database for date = tomorrow
+	//Creates table in database
 	public static void createTable (String str) {
 		tableName = Operations.modifyString(tableName, str);
 		try {
@@ -177,7 +177,7 @@ public class CommunicateDb {
 			ps = conn.prepareStatement(queryString);
 			ps.execute();
 		} catch (SQLException sql) {
-			MainDisplay.showMsg("Can not update database!");
+			Operations.showMsg("Can not update database!");
 		}
 	}
 }

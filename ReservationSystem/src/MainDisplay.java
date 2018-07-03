@@ -21,6 +21,7 @@ import javax.swing.table.DefaultTableModel;
 public class MainDisplay extends JFrame implements 
 ActionListener, ListSelectionListener, ItemListener {
 	
+	//All components 
 	Toolkit toolkit = Toolkit.getDefaultToolkit();
 	Dimension dimension = toolkit.getScreenSize();
 
@@ -45,16 +46,16 @@ ActionListener, ListSelectionListener, ItemListener {
 	String[] dates = Operations.updateDate();
 	JComboBox<String> dateList = new JComboBox<>(dates);
 	
-	public void setUpView() {
+	public MainDisplay() {
 
-		//Create a table with list of reservations
+		//Creates a table for reservation view
 		model.addRow(columnNames);
 		table.setModel(model);
 		table.setRowHeight(table.getRowHeight()+5);
 		table.getSelectionModel().addListSelectionListener(this);
 		tableField.add(table);
 	
-		//Create main function bar
+		//Creates main function bar
 		main.add(dateLabel);
 		dateList.removeItemAt(2);
 		dateList.addItemListener(this);
@@ -106,13 +107,13 @@ ActionListener, ListSelectionListener, ItemListener {
 					if (bikeId != null) {
 						CommunicateDb.setReservations(timeFrom, timeTill, input, bikeId, dates[dateList.getSelectedIndex()]);
 						CommunicateDb.displayReservations(dates[dateList.getSelectedIndex()], model);
-					} else showMsg ("Reservation is not possible! No available bikes at chosen time.");
-				} else showMsg ("Invalid id!");
-			} else showMsg("Invalid time!");
+					} else Operations.showMsg ("Reservation is not possible! No available bikes at chosen time.");
+				} else Operations.showMsg ("Invalid id!");
+			} else Operations.showMsg("Invalid time!");
 		} else JOptionPane.showMessageDialog(tableField, "You forgot employees id", "Message", JOptionPane.QUESTION_MESSAGE);
 	}
 		
-		// Performes "delete reservation" when"Cancel reservation" is clicked
+		// Performes "delete reservation" when "Cancel reservation" is clicked
 		if (e.getSource() == deleteBtn) {
 			int selectedRow = table.getSelectedRow();
 			int id = Integer.parseUnsignedInt((String) model.getValueAt(selectedRow, 0));
@@ -138,11 +139,6 @@ ActionListener, ListSelectionListener, ItemListener {
 				deleteBtn.setEnabled(true); 
 			} else deleteBtn.setEnabled(false); 
 		} else deleteBtn.setEnabled(false); 
-	}
-	
-	//Creates a error message when data is missing/invalid 
-	public static void showMsg (String str) {
-		JOptionPane.showMessageDialog(null, str, "Message", JOptionPane.ERROR_MESSAGE);
 	}
 }
 
