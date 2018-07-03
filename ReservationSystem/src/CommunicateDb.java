@@ -17,7 +17,7 @@ public class CommunicateDb {
 	//Displays all employees and added reservation if one exists
 	public static void displayReservations (String date, DefaultTableModel model) {
 		tableName = Operations.modifyString(tableName, date);
-		model.setRowCount(1);
+		model.setRowCount(0);
 		try {
 			queryString = "SELECT employees.id, name, last_name,"
 					+ " " + tableName + ".rent_from, " + tableName + ".rent_till, " + tableName + ".bike_id "

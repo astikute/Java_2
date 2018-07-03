@@ -1,3 +1,4 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -6,16 +7,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 public class MainDisplay extends JFrame implements 
@@ -25,11 +30,13 @@ ActionListener, ListSelectionListener, ItemListener {
 	Toolkit toolkit = Toolkit.getDefaultToolkit();
 	Dimension dimension = toolkit.getScreenSize();
 
-	JFrame frame = new JFrame ("Electric Bike Reservation Plan");
+	JFrame frame = new JFrame ("Electric Bicycle Reservation Plan");
 	JPanel tableField = new JPanel ();
 	JPanel main = new JPanel ();
+	
     
 	JTable table = new JTable();
+	JScrollPane scrollPane = new JScrollPane(table);
 	JLabel dateLabel = new JLabel("Select date:");
 	JLabel userLabel = new JLabel("Employee Id:");
 	JTextField inputUser = new JTextField ();
@@ -48,12 +55,20 @@ ActionListener, ListSelectionListener, ItemListener {
 	
 	public MainDisplay() {
 
-		//Creates a table for reservation view
-		model.addRow(columnNames);
+		//Creates a table for reservation plan view
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		table.setModel(model);
 		table.setRowHeight(table.getRowHeight()+5);
 		table.getSelectionModel().addListSelectionListener(this);
-		tableField.add(table);
+		tableField.add(scrollPane);
+		scrollPane.setPreferredSize(new Dimension (dimension.width - 100, dimension.height - 100));
+		scrollPane.setBorder(BorderFactory.createEmptyBorder());
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
+		for (int i = 0; i < 6; i++) {
+			table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+		}
 	
 		//Creates main function bar
 		main.add(dateLabel);
@@ -134,7 +149,7 @@ ActionListener, ListSelectionListener, ItemListener {
 	//Enables "Cancel reservation" button when table entry with existing reservation is selected 
 	public void valueChanged(ListSelectionEvent arg0) {
 		int selectedRow = table.getSelectedRow();
-		if (selectedRow > 0) {
+		if (selectedRow >= 0) {
 			if (model.getValueAt(selectedRow, 4) != null && model.getValueAt(selectedRow, 3) != null) {
 				deleteBtn.setEnabled(true); 
 			} else deleteBtn.setEnabled(false); 
