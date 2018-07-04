@@ -93,47 +93,47 @@ public class CommunicateDb {
 		int i = 0;
 		Time time1 = convertIntoTime(timeFrom);
 		Time time2 = convertIntoTime(timeTill);
-		Boolean rentAvailable;
+		Boolean rentAvailable = false;
 		
 		if (time1 != null && time2 != null) {
-		queryString = "SELECT bike_id FROM electric_bikes";
-		ps = conn.prepareStatement(queryString);
-		results = ps.executeQuery(queryString);
-		while (results.next()) {
-			arr[i] = results.getString("bike_id");
-			i++;
-		}
-		
+			
+			queryString = "SELECT bike_id FROM electric_bikes";
+			ps = conn.prepareStatement(queryString);
+			results = ps.executeQuery(queryString);
+			while (results.next()) {
+				arr[i] = results.getString("bike_id");
+				i++;
+			}
 			for (int j = 0; j < arr.length; j++) {
-				rentAvailable = true;
-				queryString = "SELECT " + tableName + ".rent_from, " + tableName + ".rent_till "
-						+ "FROM " + tableName + " WHERE bike_id = ?";
-				ps = conn.prepareStatement(queryString);
-				ps.setString(1, arr[j]);
-				results = ps.executeQuery();
-				
-				while (results.next()) {
-					dbFrom = results.getString("rent_from");
-					dbTill = results.getString("rent_till");
-					Time db1 = convertIntoTime(dbFrom);
-					Time db2 = convertIntoTime(dbTill);
-					if ((db1.before(time1) || db1.compareTo(time1) == 0) && db2.after(time1)) {
-						rentAvailable = false;
-						break;
+				if (arr[j] != null) {
+					this.dbBike = arr[j];
+					rentAvailable = true;
+					queryString = "SELECT " + tableName + ".rent_from, " + tableName + ".rent_till "
+							+ "FROM " + tableName + " WHERE bike_id = ?";
+					ps = conn.prepareStatement(queryString);
+					ps.setString(1, arr[j]);
+					results = ps.executeQuery();
+					
+					while (results.next()) {
+						dbFrom = results.getString("rent_from");
+						dbTill = results.getString("rent_till");
+						Time db1 = convertIntoTime(dbFrom);
+						Time db2 = convertIntoTime(dbTill);
+						
+						if ((db1.before(time1) || db1.compareTo(time1) == 0) && db2.after(time1)) {
+							rentAvailable = false;
+							break;
+						} else if (db1.before(time2) && (db2.after(time2) || db2.compareTo(time2) == 0)) {
+							rentAvailable = false;
+							break;
+						}
 					}
-					if (db1.before(time2) && (db2.after(time2) || db2.compareTo(time2) == 0)) {
-						rentAvailable = false;
-						break;
+					if (rentAvailable) {
+						return true;
 					}
 				}
-				if (rentAvailable) {
-					this.dbBike = arr[j];
-					return true;
-				} else continue;
 			}
 		}
-		results.close();
-		ps.close();
 		return false;
 	}
 	
@@ -198,7 +198,6 @@ public class CommunicateDb {
 			Time time = new Time(date.getTime());
 			return time;
 		} catch (ParseException e) {
-			showMsg("Invalid time!");
 			return null;
 		}
 	}

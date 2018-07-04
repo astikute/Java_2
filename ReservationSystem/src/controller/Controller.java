@@ -26,7 +26,7 @@ public class Controller  {
 			if (db.checkReservations()) {
 				db.setReservations();
 			} else {
-				db.showMsg("No bicycles are available for reservation!");
+				db.showMsg("Reservation is impossible!");
 			}
 		} else db.showMsg("Invalid employees id!");
 	}
