@@ -1,4 +1,5 @@
-import javax.swing.table.DefaultTableModel;
+import java.sql.SQLException;
+import gui.MainDisplay;
 
 public class test {
 
@@ -7,19 +8,11 @@ public class test {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
             	
-            	MainDisplay mainDisplay = new MainDisplay();
-            
-            	String[] dates = Operations.updateDate();
-            	DefaultTableModel model = mainDisplay.model;
-            	
-            	//Creates table in database for today and tomorrow reservations
-            	for (int i = 0; i < 2; i++) {
-            		CommunicateDb.createTable(dates[i]);
-            	}
-            	//Deletes table from previous day
-            	CommunicateDb.deleteTable(dates[2]);
-            	//Display reservations of today
-            	CommunicateDb.displayReservations(dates[0], model);
+            	try {
+					new MainDisplay();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
             }
         });
 	}

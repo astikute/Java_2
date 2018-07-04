@@ -1,4 +1,4 @@
-import java.awt.BorderLayout;
+package gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -7,13 +7,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-
+import java.sql.SQLException;
+import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -23,18 +23,17 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
+import controller.Controller;
+
 public class MainDisplay extends JFrame implements 
 ActionListener, ListSelectionListener, ItemListener {
 	
 	//All components 
 	Toolkit toolkit = Toolkit.getDefaultToolkit();
 	Dimension dimension = toolkit.getScreenSize();
-
 	JFrame frame = new JFrame ("Electric Bicycle Reservation Plan");
 	JPanel tableField = new JPanel ();
 	JPanel main = new JPanel ();
-	
-    
 	JTable table = new JTable();
 	JScrollPane scrollPane = new JScrollPane(table);
 	JLabel dateLabel = new JLabel("Select date:");
@@ -46,23 +45,31 @@ ActionListener, ListSelectionListener, ItemListener {
 	JTextField inputTill = new JTextField ("00:00");
 	JButton enterBtn = new JButton("Add");
 	JButton deleteBtn = new JButton("Cancel reservation");
-	
 	Object [] columnNames = {"Id", "Name", "Last Name", "From", "Till", "Bike Id"};
 	DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 	
-	String[] dates = Operations.updateDate();
-	JComboBox<String> dateList = new JComboBox<>(dates);
+	Controller controller = new Controller();
 	
-	public MainDisplay() {
+	String[] dates = controller.updateDate();
+	JComboBox<String> dateList = new JComboBox<>(dates);
+		
+	public MainDisplay() throws SQLException {
 
-		//Creates a table for reservation plan view
-		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		table.setModel(model);
+		
+        ChangeDateEvent today = new ChangeDateEvent(dates[0]);
+        ChangeDateEvent tomorrow = new ChangeDateEvent(dates[1]);
+        controller.createTables(tomorrow);
+        controller.createTables(today);
+        
+        //Creates a table for reservation plan view
+        setUpView();
+        table.setModel(model);
 		table.setRowHeight(table.getRowHeight()+5);
 		table.getSelectionModel().addListSelectionListener(this);
 		tableField.add(scrollPane);
-		scrollPane.setPreferredSize(new Dimension (dimension.width - 100, dimension.height - 100));
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setPreferredSize(new Dimension (dimension.width - 100, dimension.height - 200));
 		scrollPane.setBorder(BorderFactory.createEmptyBorder());
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		centerRenderer.setHorizontalAlignment( JLabel.CENTER );
@@ -108,33 +115,25 @@ ActionListener, ListSelectionListener, ItemListener {
 			String input = inputUser.getText().trim();
 			String timeFrom = inputFrom.getText().trim();
 			String timeTill = inputTill.getText().trim();
-		
-			Boolean isValidInput1  = Operations.isValidInput(timeFrom);
-			Boolean isValidInput2  = Operations.isValidInput(timeTill);
-			Boolean isValidUser = false;
-			String bikeId = "";
-		
-		if (input.length() != 0) {
-			if (isValidInput1 && isValidInput2) { 
-				isValidUser = CommunicateDb.validateUser(input);
-				if (isValidUser) {
-					bikeId = CommunicateDb.checkReservations(timeFrom, timeTill, dates[dateList.getSelectedIndex()]);
-					if (bikeId != null) {
-						CommunicateDb.setReservations(timeFrom, timeTill, input, bikeId, dates[dateList.getSelectedIndex()]);
-						CommunicateDb.displayReservations(dates[dateList.getSelectedIndex()], model);
-					} else Operations.showMsg ("Reservation is not possible! No available bikes at chosen time.");
-				} else Operations.showMsg ("Invalid id!");
-			} else Operations.showMsg("Invalid time!");
-		} else JOptionPane.showMessageDialog(tableField, "You forgot employees id", "Message", JOptionPane.QUESTION_MESSAGE);
-	}
+			int selectedDate = dateList.getSelectedIndex();
+			ReservationEvent event1 = new ReservationEvent(input, timeFrom, timeTill, dates[selectedDate]);
+			try {
+				controller.makeReservation(event1);
+				setUpView();
+			} catch (SQLException e1) {}
+		}
 		
 		// Performes "delete reservation" when "Cancel reservation" is clicked
 		if (e.getSource() == deleteBtn) {
 			int selectedRow = table.getSelectedRow();
-			int id = Integer.parseUnsignedInt((String) model.getValueAt(selectedRow, 0));
-			CommunicateDb.deleteReservations(id, dates[dateList.getSelectedIndex()]);
-			CommunicateDb.displayReservations(dates[dateList.getSelectedIndex()], model);
-			deleteBtn.setEnabled(false);
+			String id = (String) model.getValueAt(selectedRow, 0);
+			int selectedDate = dateList.getSelectedIndex();
+			DeleteEvent event2 = new DeleteEvent (id, dates[selectedDate]);
+			try {
+				controller.deleteReservation(event2);
+				setUpView();
+				deleteBtn.setEnabled(false);
+			} catch (SQLException e1) {}
 		}
 	}
 	
@@ -142,18 +141,31 @@ ActionListener, ListSelectionListener, ItemListener {
 	public void itemStateChanged(ItemEvent ie) {
 		if (ie.getStateChange() == ItemEvent.SELECTED) {
 			int selectedDate = dateList.getSelectedIndex();
-			CommunicateDb.displayReservations(dates[selectedDate], model);
-		}
+			ChangeDateEvent event = new ChangeDateEvent(dates[selectedDate]);
+			try {
+				controller.changeView(event);
+				setUpView();
+			} catch (SQLException e) {}	
+	     }
     }
 
 	//Enables "Cancel reservation" button when table entry with existing reservation is selected 
 	public void valueChanged(ListSelectionEvent arg0) {
 		int selectedRow = table.getSelectedRow();
-		if (selectedRow >= 0) {
+		if (selectedRow > -1) {
 			if (model.getValueAt(selectedRow, 4) != null && model.getValueAt(selectedRow, 3) != null) {
 				deleteBtn.setEnabled(true); 
 			} else deleteBtn.setEnabled(false); 
 		} else deleteBtn.setEnabled(false); 
+	}
+	
+	//Refresh table data
+	public void setUpView () throws SQLException {
+		model.setRowCount(0);
+        ArrayList<Object[]> list = controller.getReservations();
+        for (Object[] object:list) {
+        	model.addRow(object);
+        }
 	}
 }
 

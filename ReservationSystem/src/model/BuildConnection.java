@@ -1,3 +1,4 @@
+package model;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
@@ -15,7 +16,6 @@ public class BuildConnection {
 			conn = DriverManager.getConnection(url, username, password);
 			return conn;
 		} catch (Exception e) {
-			Operations.showMsg("Can not connect to database!");
 			return null;
 		}
 	}
