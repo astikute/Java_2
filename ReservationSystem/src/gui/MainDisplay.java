@@ -58,6 +58,8 @@ ActionListener, ListSelectionListener, ItemListener {
 		
         ChangeDateEvent today = new ChangeDateEvent(dates[0]);
         ChangeDateEvent tomorrow = new ChangeDateEvent(dates[1]);
+        ChangeDateEvent yesterday = new ChangeDateEvent(dates[2]);
+        controller.deleteTable(yesterday);
         controller.createTables(tomorrow);
         controller.createTables(today);
         
